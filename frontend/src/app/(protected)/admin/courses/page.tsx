@@ -106,7 +106,7 @@ export default function AdminCoursesPage() {
               {courses.map((course) => (
                 <tr key={course.id} className="border-b hover:bg-gray-50">
                   <td className="py-3 px-4 font-medium text-blue-900">{course.title}</td>
-                  <td className="px-4">฿{course.price.toLocaleString()}</td>
+                  <td className="px-4">฿{course.price?.toLocaleString() ?? 0 }</td>
                   <td className="px-4 capitalize">{course.level?.toLowerCase() || "—"}</td>
                   <td className="px-4">
                     <span className={`text-xs px-2 py-1 rounded-full

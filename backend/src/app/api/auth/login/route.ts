@@ -8,6 +8,7 @@ export async function POST(req: Request) {
     const body = await req.json()
     const { email, password } = body
 
+    // check input
     if (!email || !password) {
       return NextResponse.json(
         { success: false, error: "Email and password are required" },
@@ -15,9 +16,9 @@ export async function POST(req: Request) {
       )
     }
 
+    // find user
     const user = await prisma.user.findUnique({
       where: { email },
-      select: { id: true, name: true, email: true, role: true, status: true, password: true },
     })
 
     if (!user) {
@@ -27,14 +28,17 @@ export async function POST(req: Request) {
       )
     }
 
+    // check status
     if (user.status === "SUSPENDED") {
       return NextResponse.json(
-        { success: false, error: "Account is suspended" },
+        { success: false, error: "Account suspended" },
         { status: 403 }
       )
     }
 
+    // compare password
     const isPasswordValid = await bcrypt.compare(password, user.password)
+
     if (!isPasswordValid) {
       return NextResponse.json(
         { success: false, error: "Invalid email or password" },
@@ -42,30 +46,37 @@ export async function POST(req: Request) {
       )
     }
 
-    const token = signJwt({ userId: user.id, email: user.email, role: user.role })
+    // create jwt
+    const token = signJwt({
+      userId: user.id,
+      email: user.email,
+      role: user.role,
+    })
 
-    const { password: _pwd, ...userWithoutPassword } = user
+    // remove password
+    const { password: _pwd, ...userData } = user
 
     const response = NextResponse.json({
       success: true,
       token,
-      user: userWithoutPassword,
+      user: userData,
     })
 
-    // Also set as httpOnly cookie
+    // set cookie
     response.cookies.set("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
-      maxAge: 60 * 60 * 24 * 7, // 7 days
+      maxAge: 60 * 60 * 24 * 7,
       path: "/",
     })
 
     return response
-  } catch (error: any) {
+  } catch (error) {
     console.error("Login error:", error)
+
     return NextResponse.json(
-      { success: false, error: "Internal Server Error" },
+      { success: false, error: "Internal server error" },
       { status: 500 }
     )
   }

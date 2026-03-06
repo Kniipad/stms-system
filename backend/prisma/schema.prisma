@@ -70,6 +70,7 @@ model Course {
   coachId     Int
   coach       CoachProfile @relation(fields: [coachId], references: [id])
   price       Float
+  payments    Payment[] 
   status      CourseStatus @default(DRAFT)
   level       CourseLevel?
   startDate   DateTime?
@@ -101,7 +102,8 @@ model Payment {
   id         Int           @id @default(autoincrement())
   studentId  Int
   student    User          @relation(fields: [studentId], references: [id])
-  courseId   Int?          
+  courseId   Int?  
+  course     Course?       @relation(fields: [courseId], references: [id])        
   amount     Float
   slipUrl    String
   status     PaymentStatus @default(PENDING)
