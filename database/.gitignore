@@ -1,0 +1,20 @@
+# Dependencies
+node_modules/
+
+# Environment (ห้าม push ขึ้น GitHub เด็ดขาด)
+.env
+.env.local
+.env.*.local
+
+# Next.js
+.next/
+out/
+
+# Prisma generated
+prisma/generated/
+
+# OS
+.DS_Store
+
+# Logs
+*.log

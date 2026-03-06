@@ -1,0 +1,178 @@
+// prisma/schema.prisma
+// Sports Training Management System (STMS)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================
+// ENUMS
+// ============================================================
+
+enum Role {
+  ADMIN
+  COACH
+  STUDENT
+}
+
+enum CourseStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  REJECTED
+}
+
+// ============================================================
+// USER TABLE
+// เก็บข้อมูล ID, Username, Password (Hash), Role
+// ============================================================
+
+model User {
+  id           Int       @id @default(autoincrement())
+  username     String    @unique
+  email        String    @unique
+  passwordHash String
+  role         Role      @default(STUDENT)
+  firstName    String?
+  lastName     String?
+  phone        String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  deletedAt    DateTime? // Soft Delete
+
+  // Relations
+  enrollments        Enrollment[]
+  payments           Payment[]
+  coachSchedules     Schedule[]   @relation("CoachSchedules")
+  attendancesChecked Attendance[] @relation("CheckedByCoach")
+
+  @@map("users")
+}
+
+// ============================================================
+// COURSE TABLE
+// เก็บชื่อคอร์ส, ราคา, จำนวนครั้ง, วันหมดอายุ, สถานะ
+// ============================================================
+
+model Course {
+  id            Int          @id @default(autoincrement())
+  name          String
+  description   String?      @db.Text
+  price         Decimal      @db.Decimal(10, 2)
+  totalSessions Int          // จำนวนครั้งที่เรียนได้ทั้งหมดเมื่อซื้อคอร์ส
+  expiryDays    Int          // จำนวนวันก่อนหมดอายุ นับจากวันที่ Enroll
+  status        CourseStatus @default(ACTIVE)
+  coachRate     Decimal?     @db.Decimal(10, 2) // ค่าสอนต่อคาบ (Optional)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  deletedAt     DateTime?    // Soft Delete
+
+  // Relations
+  enrollments Enrollment[]
+  schedules   Schedule[]
+
+  @@map("courses")
+}
+
+// ============================================================
+// ENROLLMENT TABLE
+// ตารางเชื่อม User <-> Course, เก็บ Attendance Count + หมดอายุ
+// ============================================================
+
+model Enrollment {
+  id                Int       @id @default(autoincrement())
+  userId            Int
+  courseId          Int
+  remainingSessions Int       // จำนวนครั้งที่ยังเหลือ (ลดลงทุกครั้งที่เช็คชื่อ)
+  expiryDate        DateTime  // วันหมดอายุ
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  deletedAt         DateTime? // Soft Delete
+
+  // Relations
+  user        User         @relation(fields: [userId], references: [id])
+  course      Course       @relation(fields: [courseId], references: [id])
+  attendances Attendance[]
+  payments    Payment[]
+
+  @@unique([userId, courseId]) // 1 User สมัครแต่ละ Course ได้ครั้งเดียว
+  @@map("enrollments")
+}
+
+// ============================================================
+// ATTENDANCE TABLE
+// บันทึกการเช็คชื่อแต่ละครั้ง
+// ============================================================
+
+model Attendance {
+  id           Int       @id @default(autoincrement())
+  enrollmentId Int
+  checkedById  Int       // Coach ที่ทำการเช็คชื่อ
+  checkedAt    DateTime  @default(now())
+  note         String?
+  deletedAt    DateTime? // Soft Delete
+
+  // Relations
+  enrollment Enrollment @relation(fields: [enrollmentId], references: [id])
+  checkedBy  User       @relation("CheckedByCoach", fields: [checkedById], references: [id])
+
+  @@map("attendances")
+}
+
+// ============================================================
+// PAYMENT TABLE
+// เก็บประวัติการจ่ายเงิน, Slip, Status (Paid/Unpaid)
+// ============================================================
+
+model Payment {
+  id           Int           @id @default(autoincrement())
+  userId       Int
+  enrollmentId Int?          // อาจเป็น null ถ้าเป็นการชำระก่อน Enroll
+  amount       Decimal       @db.Decimal(10, 2)
+  slipUrl      String?       // URL รูปสลิปโอนเงิน
+  status       PaymentStatus @default(PENDING)
+  paidAt       DateTime?     // เวลาที่ Admin ยืนยัน
+  note         String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  deletedAt    DateTime?     // Soft Delete
+
+  // Relations
+  user       User        @relation(fields: [userId], references: [id])
+  enrollment Enrollment? @relation(fields: [enrollmentId], references: [id])
+
+  @@map("payments")
+}
+
+// ============================================================
+// SCHEDULE TABLE (Optional)
+// ตารางสอนของ Coach
+// ============================================================
+
+model Schedule {
+  id        Int       @id @default(autoincrement())
+  courseId  Int
+  coachId   Int
+  startTime DateTime
+  endTime   DateTime
+  location  String?
+  note      String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime? // Soft Delete
+
+  // Relations
+  course Course @relation(fields: [courseId], references: [id])
+  coach  User   @relation("CoachSchedules", fields: [coachId], references: [id])
+
+  @@map("schedules")
+}

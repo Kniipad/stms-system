@@ -1,0 +1,49 @@
+version: "3.8"
+
+services:
+  # ============================================================
+  # MySQL 8.0 — ข้อมูลหลัก (Users, Courses, Enrollments, etc.)
+  # ============================================================
+  mysql:
+    image: mysql:8.0
+    container_name: stms_mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: stms_db
+      MYSQL_USER: stms_user
+      MYSQL_PASSWORD: stms_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-prootpassword"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ============================================================
+  # MongoDB 6.0 — Audit Logs (Write-heavy / NoSQL)
+  # ============================================================
+  mongodb:
+    image: mongo:6.0
+    container_name: stms_mongodb
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: stms_admin
+      MONGO_INITDB_ROOT_PASSWORD: stms_mongo_password
+      MONGO_INITDB_DATABASE: stms_logs
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  mysql_data:
+  mongo_data:
