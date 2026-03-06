@@ -94,6 +94,7 @@ See `INTEGRATION_NOTES.md` for the full API reference.
 
 ## Team
 
-- Frontend Lead: Natnicha
-- Backend Lead: Phidphew
-- Database & Integration Lead: Pichayut
+- Frontend Lead: Naravin
+- Backend Lead: Achiraya
+
+- Database & Integration Lead: Phidphew
