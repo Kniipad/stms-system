@@ -34,7 +34,7 @@ export default function CoursesPage() {
       .then((res) => {
   const courses = (res.data.data ?? []).map((c: any) => ({
     ...c,
-    classDays: typeof c.classDays === "string" ? JSON.parse(c.classDays) : (c.classDays ?? []),
+    classDays: (() => { try { return typeof c.classDays === "string" ? JSON.parse(c.classDays) : (c.classDays ?? []) } catch { return [] } })(),
     coach: c.coach?.user?.name ?? c.coach?.name ?? "-",
     students: Array(c._count?.enrollments ?? 0).fill({}),
   }))

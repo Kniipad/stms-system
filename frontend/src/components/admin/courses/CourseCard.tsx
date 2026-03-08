@@ -80,10 +80,10 @@ export function CourseCard({
         )}
 
         {/* Class Days */}
-        {course.classDays && course.classDays.length > 0 && (
+        {(Array.isArray(course.classDays) ? course.classDays : []) && course.classDays.length > 0 && (
           <div className="text-xs text-green-500">
             Days:{" "}
-            {course.classDays
+            {(Array.isArray(course.classDays) ? course.classDays : [])
               .map((d) => ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][d])
               .join(", ")}
           </div>
