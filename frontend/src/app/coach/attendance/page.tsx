@@ -39,7 +39,7 @@ export default function CoachAttendancePage() {
         seen.add(s.courseId)
         return true
       })
-      setCourses(unique)
+      setCourses(unique.map((s: any) => ({ ...s, id: s.courseId })))
     })
   }, [])
 
