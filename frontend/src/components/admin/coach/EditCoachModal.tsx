@@ -24,7 +24,8 @@ export function EditCoachModal({
     if (coach) {
       setName(coach.name)
       setEmail(coach.email)
-      setExpertise(coach.expertise.join(", "))
+      const exp = Array.isArray(coach.expertise) ? coach.expertise : (coach.expertise ? String(coach.expertise).split(",").map(e => e.trim()) : [])
+      setExpertise(exp.join(", "))
     }
   }, [coach])
 

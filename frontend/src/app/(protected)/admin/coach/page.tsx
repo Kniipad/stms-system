@@ -67,6 +67,16 @@ export default function CoachesPage() {
             )
           } catch { setError("Failed to delete coach") }
         }}
+        onActivate={async (id) => {
+          try {
+            await axios.put(`/api/admin/coaches/${id}`, { status: "active" })
+            setCoaches((prev) =>
+              prev.map((c) =>
+                c.id === id ? { ...c, status: "ACTIVE" } : c
+              )
+            )
+          } catch { setError("Failed to activate coach") }
+        }}
       />
 
       <AddCoachModal
@@ -75,7 +85,7 @@ export default function CoachesPage() {
         onAdd={async (coach) => {
           try {
             const res = await axios.post("/api/admin/coaches", { ...coach, status: "active", totalCourses: 0 })
-            setCoaches((prev) => [...prev, res.data])
+            setCoaches((prev) => [...prev, res.data.data ?? res.data])
           } catch { setError("Failed to add coach") }
         }}
       />

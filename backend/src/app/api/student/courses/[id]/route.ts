@@ -2,10 +2,11 @@ import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { requireRole } from "@/lib/auth"
 
-export async function GET(req: Request, { params }: { params: { id: string } }) {
+export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const student = await requireRole(req, "STUDENT")
-    const courseId = parseInt(params.id)
+    const { id } = await params
+    const courseId = parseInt(id)
 
     if (isNaN(courseId)) {
       return NextResponse.json({ success: false, error: "Invalid course ID" }, { status: 400 })

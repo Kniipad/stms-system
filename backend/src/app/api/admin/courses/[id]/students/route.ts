@@ -10,7 +10,8 @@ export async function GET(
     // ตรวจสอบสิทธิ์ ADMIN
     const admin = await requireRole(req, "ADMIN")
 
-    const courseId = parseInt(params.id)
+    const { id } = await params
+    const courseId = parseInt(id)
 
     if (isNaN(courseId)) {
       return NextResponse.json(

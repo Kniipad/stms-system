@@ -15,7 +15,7 @@ export async function createLog(
     await connectMongo()
     
     // Attempt to get IP address
-    const headersList = headers()
+    const headersList = await headers()
     let ipAddress = "unknown"
     const forwarded = headersList.get("x-forwarded-for")
     if (forwarded) {

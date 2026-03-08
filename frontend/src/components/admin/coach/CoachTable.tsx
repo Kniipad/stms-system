@@ -10,12 +10,14 @@ type Props = {
   coaches: Coach[]
   onUpdate: (coach: Coach) => void
   onSoftDelete: (id: number) => void
+  onActivate?: (id: number) => void
 }
 
 export function CoachTable({
   coaches,
   onUpdate,
   onSoftDelete,
+  onActivate,
 }: Props) {
   const [editCoach, setEditCoach] = useState<Coach | null>(null)
   const [sortKey, setSortKey] = useState<keyof Coach | null>(null)
@@ -56,17 +58,17 @@ export function CoachTable({
               <tr key={c.id} className="border-b hover:bg-gray-50">
                 <td className="p-4 text-gray-400">{c.id}</td>
                 <td className="p-4 font-medium text-blue-900">{c.name}</td>
-                <td className="p-4 text-blue-900">{c.expertise.join(", ")}</td>
+                <td className="p-4 text-blue-900">{(Array.isArray(c.expertise) ? c.expertise : (c.expertise ? c.expertise.split(",") : [])).join(", ")}</td>
                 <td className="p-4 text-blue-900">{c.totalCourses}</td>
                 <td className="p-4">
                   <span
                     className={`px-3 py-1 rounded-full text-xs ${
-                      c.status.toLowerCase() === "active"
+                      (c.status ?? "").toLowerCase() === "active"
                         ? "bg-green-100 text-green-700"
                         : "bg-gray-100 text-gray-600"
                     }`}
                   >
-                    {c.status}
+                    {c.status ?? "-"}
                   </span>
                 </td>
                 <td className="p-4 text-right space-x-3">
@@ -84,12 +86,19 @@ export function CoachTable({
                     Edit
                   </button>
 
-                  {c.status.toLowerCase() === "active" && (
+                  {(c.status ?? "").toLowerCase() === "active" ? (
                     <button
                       onClick={() => setDeleteCoach(c)}
                       className="text-red-600 hover:underline"
                     >
                       Deactivate
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => onActivate?.(c.id)}
+                      className="text-green-600 hover:underline"
+                    >
+                      Activate
                     </button>
                   )}
                 </td>

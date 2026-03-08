@@ -52,7 +52,7 @@ export function AddCoachModal({ open, onClose, onAdd }: Props) {
         <div className="px-6 py-4 border-t flex justify-end gap-2">
           <button onClick={onClose}>Cancel</button>
           <button
-            onClick={() => {
+            onClick={() => { setName(""); setEmail(""); setExpertise("");
               onAdd({
                 name,
                 email,
