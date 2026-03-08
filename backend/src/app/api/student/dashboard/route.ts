@@ -63,6 +63,10 @@ export async function GET(req: Request) {
         title: e.course.title,
         progress: progress,
         status: e.course.status.toLowerCase(),
+        totalSessions: totalSessions,
+        attendedSessions: attendedSessions,
+        startDate: e.course.startDate?.toISOString().split("T")[0] ?? null,
+        endDate: e.course.endDate?.toISOString().split("T")[0] ?? null,
       }
     })
 

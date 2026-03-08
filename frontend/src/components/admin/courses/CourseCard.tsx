@@ -75,7 +75,7 @@ export function CourseCard({
         {course.startDate && course.endDate && (
           <div className="flex items-center gap-2 text-xs text-green-500">
             <CalendarDays className="w-4 h-4" />
-            {course.startDate} → {course.endDate}
+            {course.startDate?.slice(0,10)} → {course.endDate?.slice(0,10)}
           </div>
         )}
 

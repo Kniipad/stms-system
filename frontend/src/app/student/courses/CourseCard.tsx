@@ -62,13 +62,13 @@ function LevelBadge({ level }: { level: CourseLevel }) {
     <span
       className={`text-xs px-2 py-1 rounded-full font-medium
         ${
-          level === "beginner"
+          level?.toLowerCase() === "beginner"
             ? "bg-green-100 text-green-700"
             : "bg-purple-100 text-purple-700"
         }
       `}
     >
-      {level === "beginner" ? "Beginner" : "Advanced"}
+      {level?.toLowerCase() === "beginner" ? "Beginner" : level?.toLowerCase() === "intermediate" ? "Intermediate" : "Advanced"}
     </span>
   )
 }

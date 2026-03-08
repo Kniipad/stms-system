@@ -79,7 +79,7 @@ export function CourseTable({ courses, onUpdate, onDelete }: Props) {
 
                 <td className="p-4 text-xs text-gray-600">
                   {c.startDate && c.endDate
-                    ? `${c.startDate} → ${c.endDate}`
+                    ? `${c.startDate?.slice(0,10)} → ${c.endDate?.slice(0,10)}`
                     : "-"}
                 </td>
 

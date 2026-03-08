@@ -64,8 +64,8 @@ export default function StudentDashboard() {
 
   useEffect(() => {
     axios.get("/api/student/dashboard").then((res) => {
-      setCourses(res.data.courses ?? [])
-      setAttendanceHistory(res.data.attendance ?? [])
+      setCourses(res.data.data?.myCourses ?? res.data.courses ?? [])
+      setAttendanceHistory(res.data.data?.todayClasses ?? res.data.attendance ?? [])
     })
   }, [])
 
