@@ -54,7 +54,7 @@ stms-system/
 
 ```bash
 git clone https://github.com/PhidPhew/sports-team-management-system
-cd stms-system
+cd sports-team-management-system
 ```
 
 ### 2. เริ่ม Database ด้วย Docker
